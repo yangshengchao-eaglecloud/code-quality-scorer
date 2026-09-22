@@ -5,6 +5,8 @@
 只评「代码是怎么组织的」——分层、封装、数据流、模块边界、演进健康。不评业务功能对错，不评算法优劣，不评性能。规则与编程语言无关：任何语言的项目用同一把尺子。
 
 > 这是一个 AI 编码助手技能包（skill）。把本目录放进助手的 skills 目录即可使用，见[使用方法](#使用方法)。
+>
+> **示例报告 · 在线查看渲染效果** → <https://yangshengchao-eaglecloud.github.io/code-quality-scorer/examples/report-sample.html>
 
 ---
 
@@ -180,7 +182,7 @@ xxx-service 这次重构之后，代码组织比上个月好还是差了
 
 ### 单项目报告示例
 
-下面是 xxx-service 的完整报告（两个项目的完整对比见 [examples/report-sample.html](examples/report-sample.html)）。
+下面是 xxx-service 的完整报告（两个项目的完整对比见[在线示例报告](https://yangshengchao-eaglecloud.github.io/code-quality-scorer/examples/report-sample.html)）。
 
 ---
 
@@ -243,16 +245,18 @@ xxx-service 这次重构之后，代码组织比上个月好还是差了
 
 ### 渲染后的效果
 
-[examples/report-sample.html](examples/report-sample.html) 是完整输出的 HTML 渲染版，含两个项目的对比报告，自上而下为：
+**在线查看 → <https://yangshengchao-eaglecloud.github.io/code-quality-scorer/examples/report-sample.html>**
+
+完整输出的 HTML 渲染版，含两个项目的对比报告，自上而下为：
 
 1. **汇总表**——每个对象的分数与段位
 2. **分数分布**——条形对比，一眼看出谁高谁低
 3. **规则要点**——结构主维度权重、限幅与从轻条款（读取分数的口径）
 4. **逐项目一节完整报告**——总分与定位 → 好的方面 → 质量属性面板 / 结构维度明细（双栏并排，附封顶判定）→ 问题清单（P0–P3 彩色卡片，每条含症状 / 出处 / 后果 / 修复四段）
 
-**在线查看** → <https://yangshengchao-eaglecloud.github.io/code-quality-scorer/examples/report-sample.html>
+源码保留在 [`examples/report-sample.html`](examples/report-sample.html)，下载后本地打开：单文件、零外部依赖，离线可用。
 
-GitHub 不渲染仓库里的 HTML——`blob/` 视图对文本文件一律显示源码，`raw.githubusercontent.com` 也故意以 `text/plain` 返回，都是为防 XSS。所以本仓库启用了 GitHub Pages 提供渲染后的页面。也可以下载后本地打开：单文件、零外部依赖，离线可用。
+**为什么只能给链接、不能真内嵌**：GitHub 的 Markdown 清洗会剥掉 `iframe` 等标签，所以在 README 里放一个内嵌视图是不可能的；而点仓库里的 `.html` 文件又只会跳到源码——`blob/` 视图对文本文件一律显示源码，`raw.githubusercontent.com` 也故意以 `text/plain` 返回，两者都是防 XSS。本仓库因此启用了 GitHub Pages 托管渲染页，上面的链接就是它。
 
 ## 仓库结构
 
