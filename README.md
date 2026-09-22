@@ -250,7 +250,9 @@ xxx-service 这次重构之后，代码组织比上个月好还是差了
 3. **规则要点**——结构主维度权重、限幅与从轻条款（读取分数的口径）
 4. **逐项目一节完整报告**——总分与定位 → 好的方面 → 质量属性面板 / 结构维度明细（双栏并排，附封顶判定）→ 问题清单（P0–P3 彩色卡片，每条含症状 / 出处 / 后果 / 修复四段）
 
-纯静态单文件，无外部依赖，下载后用浏览器直接打开即可（GitHub 上点击 HTML 文件默认显示源码，也可启用 GitHub Pages 后在线查看）。
+**在线查看** → <https://yangshengchao-eaglecloud.github.io/code-quality-scorer/examples/report-sample.html>
+
+GitHub 不渲染仓库里的 HTML——`blob/` 视图对文本文件一律显示源码，`raw.githubusercontent.com` 也故意以 `text/plain` 返回，都是为防 XSS。所以本仓库启用了 GitHub Pages 提供渲染后的页面。也可以下载后本地打开：单文件、零外部依赖，离线可用。
 
 ## 仓库结构
 
