@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>代码质量评分报告 · 示例（已脱敏）</title>
+<style>
+  :root{
+    --ink:#1a1f28; --sub:#5b6472; --line:#e3e7ee; --bg:#f6f7fa; --card:#ffffff;
+    --good:#0e8a5f; --goodbg:#eaf7f1;
+    --p0:#7d2073; --p0bg:#f5e4f0;
+    --p1:#c0392b; --p1bg:#fdeeec;
+    --p2:#c96a10; --p2bg:#fdf3e6;
+    --p3:#8a7a1f; --p3bg:#faf6df;
+    --accent:#2b5fd9;
+    --hi:#0e8a5f; --mid:#2b7ad9; --low:#c96a10; --bad:#c0392b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.65;padding:40px 16px;
+    font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto}
+  h1{font-size:26px;margin-bottom:4px;letter-spacing:-.01em}
+  .meta{color:var(--sub);font-size:13px;margin-bottom:14px}
+  .meta b{color:var(--ink)}
+  h2{font-size:19px;margin:36px 0 14px;padding-left:10px;border-left:4px solid var(--accent)}
+  h3{font-size:15px;margin:0 0 8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin-bottom:16px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{background:#f0f3f8;font-weight:600;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  code{background:#eef1f6;border-radius:4px;padding:1px 5px;font-family:"SF Mono",Menlo,Consolas,monospace;
+    font-size:12px;color:#33415c}
+  .score-badge{display:inline-flex;align-items:baseline;gap:6px;font-weight:700}
+  .score-badge .n{font-size:30px;letter-spacing:-.02em}
+  .score-badge .d{font-size:13px;color:var(--sub);font-weight:400}
+  .s-hi{color:var(--hi)} .s-mid{color:var(--mid)} .s-low{color:var(--low)} .s-bad{color:var(--bad)}
+  .bar-row{display:grid;grid-template-columns:130px 1fr 190px;gap:10px;align-items:center;margin:8px 0;font-size:13.5px}
+  .bar-track{background:#eceff4;border-radius:5px;height:16px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:5px}
+  .verdict{font-size:13px;color:var(--sub)}
+  .verdict b{color:var(--ink)}
+  .loc{font-size:14.5px;margin-bottom:2px}
+  .loc b{color:var(--ink)}
+  ul.good{list-style:none}
+  ul.good li{padding:7px 10px;background:var(--goodbg);border-radius:7px;margin-bottom:6px;font-size:13.5px}
+  ul.good li:last-child{margin-bottom:0}
+  ul.good li b{color:var(--good)}
+  .issue{border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13.5px}
+  .issue:last-child{margin-bottom:0}
+  .issue .tag{display:inline-block;font-weight:700;font-size:12px;border-radius:4px;padding:0 7px;margin-right:8px;color:#fff}
+  .i0{background:var(--p0bg);border-left:4px solid var(--p0)} .i0 .tag{background:var(--p0)}
+  .i1{background:var(--p1bg);border-left:4px solid var(--p1)} .i1 .tag{background:var(--p1)}
+  .i2{background:var(--p2bg);border-left:4px solid var(--p2)} .i2 .tag{background:var(--p2)}
+  .i3{background:var(--p3bg);border-left:4px solid var(--p3)} .i3 .tag{background:var(--p3)}
+  .issue .four{display:grid;grid-template-columns:64px 1fr;gap:2px 10px;margin-top:4px}
+  .issue .four b{color:var(--sub);font-weight:600;font-size:12.5px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:820px){.grid2{grid-template-columns:1fr}.bar-row{grid-template-columns:96px 1fr 150px}}
+  .note{font-size:12.5px;color:var(--sub);margin-top:8px}
+  .toc a{color:var(--accent);text-decoration:none;margin-right:16px;font-size:13.5px}
+  .toc a:hover{text-decoration:underline}
+  .banner{padding:11px 15px;font-size:13px;color:#7a5510;background:#fdf7e8;border:1px solid #f2e2b8;
+    border-radius:9px;margin-bottom:22px}
+  footer{margin-top:36px;color:var(--sub);font-size:12px;text-align:center;line-height:1.9}
+  @media print{
+    body{background:#fff;padding:0;font-size:11.5pt}
+    .card{box-shadow:none;break-inside:avoid;page-break-inside:avoid}
+    .banner{background:#fff;border-color:#ccc}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>代码质量评分报告<span style="font-size:13px;font-weight:600;color:var(--mid);background:#e7f0f9;border:1px solid #cfe2f2;border-radius:999px;padding:2px 9px;vertical-align:4px;margin-left:8px">示例</span></h1>
+<div class="meta">评分器 <b>code-quality-scorer</b> · 唯一输入：<b>源代码与配置文件</b>（项目文档 / tests 一律未读） · 两个项目对比</div>
+
+<div class="banner">本页为脱敏示例：所有项目名、目录名、文件名、行号均为虚构占位符，不对应任何真实项目。</div>
+
+<div class="card toc">
+  <a href="#summary">① 汇总</a><a href="#rules">② 规则要点</a><a href="#gw">③ xxx-gateway 88</a><a href="#sv">④ xxx-service 72</a>
+</div>
+
+<!-- ============ ① 汇总 ============ -->
+<h2 id="summary">① 汇总</h2>
+<div class="card">
+<table>
+<tr><th>对象</th><th>分数</th><th>段位</th></tr>
+<tr><td><b>xxx-gateway</b></td><td><b class="s-mid">88</b></td><td>规范段</td></tr>
+<tr><td><b>xxx-service</b></td><td><b class="s-low">72</b></td><td>结构成立，存在系统性短板</td></tr>
+</table>
+<div class="note">分数由评分器按代码实况给出，即最终分数——不设所有者终审覆盖。同一份代码换谁来评、什么时候评，分数落在同一位。</div>
+</div>
+
+<div class="card">
+<h3>分数分布</h3>
+<div class="bar-row"><span><b>xxx-gateway</b></span><div class="bar-track"><div class="bar-fill" style="width:88%;background:#2b7ad9"></div></div><span class="verdict"><b>88</b> · 规范段</span></div>
+<div class="bar-row"><span><b>xxx-service</b></span><div class="bar-track"><div class="bar-fill" style="width:72%;background:#c96a10"></div></div><span class="verdict"><b>72</b> · 结构成立有短板</span></div>
+</div>
+
+<!-- ============ ② 规则要点 ============ -->
+<h2 id="rules">② 规则要点</h2>
+<div class="card grid2">
+<div>
+<h3>结构主维度决定水位</h3>
+<table>
+<tr><th>维度</th><th>权重</th></tr>
+<tr><td>2 封装彻底、最小暴露面</td><td><b>20</b></td></tr>
+<tr><td>1 层次分明</td><td>15</td></tr>
+<tr><td>3 调用方知识边界</td><td>15</td></tr>
+<tr><td>4 数据流 / 6 模块边界 / 10 组装</td><td>10×3</td></tr>
+</table>
+<div class="note">结构形态好 = 85 基线起；结构重扣条款每类 12–18 分；封顶条款（共用数据模型无集中定义点 → 上限 40）。</div>
+</div>
+<div>
+<h3>限幅与从轻（带边界）</h3>
+<table>
+<tr><th>项</th><th>规则</th></tr>
+<tr><td>内务三维合计</td><td>≤10 分，只保护有收敛意志的内务</td></tr>
+<tr><td>零收敛补丁堆</td><td>升级结构重扣，不受限幅保护</td></tr>
+<tr><td>点状缺陷</td><td>合计 ≤8 分</td></tr>
+<tr><td>组合根全局可达</td><td>从轻 P2（三条越界条件照扣）</td></tr>
+<tr><td>进程内共享上下文</td><td>从轻 P2（三条越界条件照扣）</td></tr>
+</table>
+<div class="note">从轻只降档位不改存在性：问题照进清单，修复指引效力不变。</div>
+</div>
+</div>
+
+<!-- ============ ③ xxx-gateway ============ -->
+<h2 id="gw">③ xxx-gateway — 88 / 100</h2>
+<div class="card">
+<div class="score-badge s-mid"><span class="n">88</span><span class="d">/ 100 · 规范段</span></div>
+<div class="loc"><b>定位：</b>结构形态好、分层方向正确，本来就站在 85 基线之上；四条小问题只进清单不压水位——路由规则两处各写一份、入口少做一次转换、两个数值硬编码、日志出口没收敛。<b>封顶未命中、无结构重扣。</b></div>
+</div>
+
+<div class="card">
+<h3>好的方面</h3>
+<ul class="good">
+<li><b>类型边界关得住（立身之本）</b>：外部协议类型零外泄，入口完成「原始消息 → 业务对象」的完整转化，下游模块只见业务对象（<code>xxx/entry/</code> 整目录）</li>
+<li><b>对扩展开放、对修改关闭</b>：新增一种输出方式只需新增一个实现类，处理层零改动（<code>xxx/export/</code>）——全库最值钱的部分，整改时不要动</li>
+<li><b>模块边界清晰</b>：抽查 7 个模块全部满足「输入 → 处理 → 输出」，无循环依赖</li>
+<li><b>无全局业务状态</b>：业务对象一律在入口创建后按成员传递，全库没有业务单例</li>
+</ul>
+</div>
+
+<div class="card grid2">
+<div><h3>质量属性面板</h3>
+<table>
+<tr><th>属性</th><th>得分</th></tr>
+<tr><td>易读</td><td>89</td></tr><tr><td>易维护</td><td>86</td></tr>
+<tr><td>易扩展</td><td>88</td></tr><tr><td>简单</td><td>83</td></tr>
+<tr><td>灵活</td><td>88</td></tr><tr><td>易测试</td><td>90</td></tr>
+<tr><td>易移植</td><td>90</td></tr><tr><td>安全边界</td><td>86</td></tr>
+</table></div>
+<div><h3>结构维度明细</h3>
+<table>
+<tr><th>维度</th><th>得分</th></tr>
+<tr><td>1 层次分明</td><td>92</td></tr><tr><td>2 封装</td><td>86</td></tr>
+<tr><td>3 知识边界</td><td>84</td></tr><tr><td>4 数据流</td><td>90</td></tr>
+<tr><td>5 业务流</td><td>88</td></tr><tr><td>6 模块边界</td><td>92</td></tr>
+<tr><td>7 策略分离</td><td>88</td></tr><tr><td>8 校验位置</td><td>85</td></tr>
+<tr><td>9 演进健康</td><td>80</td></tr><tr><td>10 组装</td><td>88</td></tr>
+</table><div class="note">封顶：未命中</div></div>
+</div>
+
+<div class="card">
+<h3>问题清单（P2×2 + P3×2，全部可修，不压结构水位）</h3>
+<div class="issue i2"><span class="tag">P2</span><b>路由优先级规则两处各写一份</b>（<code>xxx/router/RouteMatcher.java:64</code> 与 <code>xxx/router/RoutePlan.java:31</code>）——两处写法还不一样，改动容易只改一处，两处静默漂移。
+<div class="four"><b>症状</b><span>同一个决策有两份表达，且已出现写法分歧</span>
+<b>出处</b><span>维度 9 演进健康「知识重复：同一决策多处表达」</span>
+<b>后果</b><span>改一处漏一处即出线上问题；读者无法判断哪份是正解</span>
+<b>修复</b><span>收敛成一份实现，另一处改为调用；保留的那份加注释说明是唯一定义点</span></div></div>
+<div class="issue i2"><span class="tag">P2</span><b>上游报文字段未在入口一次转成业务对象</b>（<code>xxx/entry/HttpEntry.java:41</code>）——两个下游模块各自解析一遍同一段报文。
+<div class="four"><b>症状</b><span>转化与校验散在消费方，边界处没有一次完成</span>
+<b>出处</b><span>维度 8 校验放对位置「不可信输入应在边界一次拦截」</span>
+<b>后果</b><span>解析规则多处漂移；外部格式一变要改多个模块</span>
+<b>修复</b><span>入口完成转化，下游只接业务对象，不再看见原始报文</span></div></div>
+<div class="issue i3"><span class="tag">P3</span><b>并发上限与超时时间硬编码</b>（<code>xxx/config/Limits.java:12</code>）
+<div class="four"><b>症状</b><span>两个数值钉死在代码里，环境不同只能改代码重新发版</span>
+<b>出处</b><span>维度 7 策略与代码分离「可变语义进配置」</span>
+<b>后果</b><span>伤灵活：部署差异靠改源码适配</span>
+<b>修复</b><span>进配置 + 缺省值兜底，代码里零魔数</span></div></div>
+<div class="issue i3"><span class="tag">P3</span><b>多路输出无统一出口</b>（<code>xxx/filter/AccessLogFilter.java:88</code>）
+<div class="four"><b>症状</b><span>访问日志与业务日志各走一条管道，新增一路输出要动处理层</span>
+<b>出处</b><span>维度 5 业务流清晰「多路输出应有统一出口抽象」</span>
+<b>后果</b><span>伤易扩展：出口变化与业务处理纠缠在一起</span>
+<b>修复</b><span>收敛为统一出口抽象，新增出口不碰处理层</span></div></div>
+</div>
+
+<!-- ============ ④ xxx-service ============ -->
+<h2 id="sv">④ xxx-service — 72 / 100</h2>
+<div class="card">
+<div class="score-badge s-low"><span class="n">72</span><span class="d">/ 100 · 结构成立，存在系统性短板</span></div>
+<div class="loc"><b>定位：</b>分层与模块边界是清楚的，本来在 85 基线，被「<b>调用方必须懂内部规则</b>」一条重扣 13 分压到这里——四个调用点各自复述同一套分流规则。其余硬编码、轮次注释属小毛病，进清单不压分。<b>封顶未命中。</b></div>
+</div>
+
+<div class="card">
+<h3>好的方面</h3>
+<ul class="good">
+<li><b>三层各归其位</b>：工具层不含业务概念，共用的数据结构集中在 <code>xxx/model/</code>，业务实现收敛在 <code>xxx/manager/</code>——全库最值钱的部分，整改时不要动</li>
+<li><b>模块边界清晰</b>：抽查 6 个管理器，每个都能单独构造输入、断言输出（<code>xxx/manager/</code>）</li>
+<li><b>依赖方向干净</b>：无循环依赖，工具层没有任何反向依赖</li>
+<li><b>主流程有统一编排点</b>：业务入口一眼能读到步骤序列（<code>xxx/manager/BillManager.java</code>）</li>
+</ul>
+</div>
+
+<div class="card grid2">
+<div><h3>质量属性面板</h3>
+<table>
+<tr><th>属性</th><th>得分</th></tr>
+<tr><td>易读</td><td>79</td></tr><tr><td>易维护</td><td>67</td></tr>
+<tr><td>易扩展</td><td>68</td></tr><tr><td>简单</td><td>65</td></tr>
+<tr><td>灵活</td><td>70</td></tr><tr><td>易测试</td><td>79</td></tr>
+<tr><td>易移植</td><td>75</td></tr><tr><td>安全边界</td><td>69</td></tr>
+</table></div>
+<div><h3>结构维度明细</h3>
+<table>
+<tr><th>维度</th><th>得分</th></tr>
+<tr><td>1 层次分明</td><td>85</td></tr><tr><td>2 封装</td><td>68</td></tr>
+<tr><td>3 知识边界</td><td>55</td></tr><tr><td>4 数据流</td><td>80</td></tr>
+<tr><td>5 业务流</td><td>78</td></tr><tr><td>6 模块边界</td><td>82</td></tr>
+<tr><td>7 策略分离</td><td>65</td></tr><tr><td>8 校验位置</td><td>70</td></tr>
+<tr><td>9 演进健康</td><td>60</td></tr><tr><td>10 组装</td><td>74</td></tr>
+</table><div class="note">封顶：未命中　|　压分主因：维度 3（结构重扣）</div></div>
+</div>
+
+<div class="card">
+<h3>问题清单（P1×2 + P2×3 + P3×2）</h3>
+<div class="issue i1"><span class="tag">P1</span><b>分流规则外泄，四个调用点各自复述</b>（<code>xxx/manager/SettlementManager.java:88</code> 等 4 处调用点）
+<div class="four"><b>症状</b><span>被调方按金额暴露 3 个同级方法，调用方必须懂内部分流规则才能选对，加一档金额要改 4 个地方</span>
+<b>出处</b><span>维度 3 调用方知识边界「多入口同级暴露 + 调用点复述内部规则」</span>
+<b>后果</b><span>伤易扩展与易维护：每加一种情况，所有调用点都要改，漏改一处即出错</span>
+<b>修复</b><span>分流规则内移，对外只留一个入口 + 意图参数，调用点零判断</span></div></div>
+<div class="issue i1"><span class="tag">P1</span><b>外部类逐字段读写数据结构</b>（<code>xxx/service/ReportService.java:41</code>，同类共 4 处）
+<div class="four"><b>症状</b><span>12 个字段被 4 个外部类逐字段读改，自己做业务判断，数据和操作数据的行为分了家</span>
+<b>出处</b><span>维度 2 封装彻底、最小暴露面（结构重扣条款）</span>
+<b>后果</b><span>伤易维护与安全边界：字段语义散在各方，改字段即牵动一片</span>
+<b>修复</b><span>字段收敛为只读 + 语义函数，判断逻辑回到数据自己的方法里</span></div></div>
+<div class="issue i2"><span class="tag">P2</span><b>上下文对象被三个不相干模块交叉读写</b>（<code>xxx/context/BillContext.java</code>）
+<div class="four"><b>症状</b><span>追一条数据要来回跨 3 个文件，数据走的是隐式共享通道</span>
+<b>出处</b><span>维度 4 数据流清晰「数据应显式传递、来去可追踪」</span>
+<b>后果</b><span>伤易读、易测试：改一个字段不知道还有谁会读</span>
+<b>修复</b><span>按用途拆成小对象，改为参数显式传入传出</span></div></div>
+<div class="issue i2"><span class="tag">P2</span><b>单函数 210 行、嵌套 5 层</b>（<code>xxx/manager/ReconcileManager.java:120</code>）
+<div class="four"><b>症状</b><span>读完了说不出有哪几步，步骤序列在阅读层不可见</span>
+<b>出处</b><span>维度 5 业务流清晰「超过一屏的流程必须步骤可读」</span>
+<b>后果</b><span>伤易读：理解这段代码要靠调试器单步</span>
+<b>修复</b><span>按步骤拆私有方法，主流程保留编号步骤注释</span></div></div>
+<div class="issue i2"><span class="tag">P2</span><b>配置只有零散取值，没有体系</b>（<code>xxx/config/</code> 目录外共 7 处）
+<div class="four"><b>症状</b><span>阈值、重试次数硬编码，无统一写入口、读侧无快照</span>
+<b>出处</b><span>维度 7 策略与代码分离「配置是体系能力，不是零散取值」</span>
+<b>后果</b><span>伤灵活、易移植：换环境要逐处改代码</span>
+<b>修复</b><span>建统一配置入口 + 缺省值兜底，读侧拿不可变快照</span></div></div>
+<div class="issue i3"><span class="tag">P3</span><b>持有业务状态的对象自立全局单例</b>（<code>xxx/manager/BillNotifier.java:18</code>）
+<div class="four"><b>症状</b><span>多个模块直接取用，依赖关系藏进全局访问点</span>
+<b>出处</b><span>维度 10 对象组装「业务对象不许自立全局单例」</span>
+<b>后果</b><span>伤易测试：没有注入点，换假实现要动全局</span>
+<b>修复</b><span>改为入口处创建、按成员传递</span></div></div>
+<div class="issue i3"><span class="tag">P3</span><b>评审轮次注释比业务注释还密</b>（全库 31 处）
+<div class="four"><b>症状</b><span>补丁摞补丁从没整理过，注释在讲修改史而不是讲当前规则</span>
+<b>出处</b><span>维度 9 演进健康「注释堆评审轮次」</span>
+<b>后果</b><span>伤简单、易维护：读者分不清哪条是现行规则</span>
+<b>修复</b><span>清理轮次注释，同一决策只留一份表达</span></div></div>
+</div>
+
+<footer>
+  本页为 code-quality-scorer 的输出示例，所有项目名、目录名、文件名、行号均为虚构占位符，不对应任何真实项目。<br>
+  评分任务只读：不修改、不删除、不移动被评项目的任何文件。P0–P3 问题清单是修复指引，效力不随分数变化。
+</footer>
+
+</div>
+</body>
+</html>
